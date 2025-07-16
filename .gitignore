@@ -12,9 +12,6 @@ expo-env.d.ts
 .npm/
 .vscode/
 
-ios/
-android/
-
 # Native
 .kotlin/
 *.orig.*
