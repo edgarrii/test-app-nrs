@@ -1,6 +1,7 @@
-import { useDoubleTap } from '@/hooks/useDoubleTap';
-import React, { memo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import React, { memo, useMemo } from 'react';
+import { StyleSheet, Text, ViewStyle } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS } from 'react-native-reanimated';
 
 interface StatesListItemProps {
   state: string;
@@ -12,16 +13,29 @@ interface StatesListItemProps {
 
 export const StatesListItem = memo(
   ({ state, highlighted, style, onSinglePress, onDoublePress }: StatesListItemProps) => {
-    const onPress = useDoubleTap(onDoublePress, onSinglePress);
+    const singleTap = useMemo(
+      () =>
+        Gesture.Tap()
+          .maxDuration(250)
+          .onStart(() => runOnJS(onSinglePress)()),
+      [onSinglePress],
+    );
+
+    const doubleTap = useMemo(
+      () =>
+        Gesture.Tap()
+          .maxDuration(250)
+          .numberOfTaps(2)
+          .onStart(() => runOnJS(onDoublePress)()),
+      [onDoublePress],
+    );
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.5}
-        style={[styles.wrapper, highlighted && styles.highlighted, style]}
-        onPress={onPress}
-      >
-        <Text style={styles.text}>{state}</Text>
-      </TouchableOpacity>
+      <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
+        <Animated.View style={[styles.wrapper, highlighted && styles.highlighted, style]}>
+          <Text style={styles.text}>{state}</Text>
+        </Animated.View>
+      </GestureDetector>
     );
   },
 );

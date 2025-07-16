@@ -19,14 +19,20 @@ export default function HomeScreen() {
 
   const inputRef = useRef<TextInput>(null);
 
+
   const handleSearch = useCallback((text: string) => {
     setSearch(text);
   }, []);
 
-  const handleItemPress = useCallback((state: State) => {
-    setSelectedState(state);
-    hideKeyboard();
-  }, []);
+  const handleItemPress = useCallback(
+    (state: State) => {
+      if (!selectedState) {
+        setSelectedState(state);
+        hideKeyboard();
+      }
+    },
+    [selectedState],
+  );
 
   const handleItemDoublePress = useCallback((state: string) => {
     setHighlightedStates((prev) => (prev.includes(state) ? prev.filter((i) => i !== state) : [...prev, state]));
@@ -34,7 +40,6 @@ export default function HomeScreen() {
   }, []);
 
   const hideKeyboard = () => {
-    console.log('hideKeyboard');
     Keyboard.dismiss();
     inputRef.current?.blur();
   };
@@ -60,7 +65,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.container}>
       <View
         style={[
           styles.wrapper,
@@ -92,9 +97,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   wrapper: {
     flex: 1,
     paddingTop: 40,

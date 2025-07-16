@@ -18,7 +18,7 @@ export const Modal = memo(({ state, onClose }: ModalProps) => {
   return (
     <Animated.View entering={FadeIn.duration(400)} exiting={FadeOut.duration(400)} style={styles.wrapper}>
       <Animated.View
-        entering={FadeInDown.duration(200).delay(200)}
+        entering={FadeInDown.duration(300).delay(100)}
         exiting={FadeOutDown.duration(200)}
         style={styles.modal}
       >
@@ -30,7 +30,7 @@ export const Modal = memo(({ state, onClose }: ModalProps) => {
             <Text style={styles.text}>Number of Countries: {state.counties}</Text>
             {isError ? (
               <View style={styles.error}>
-                <Text style={styles.errorText}>Error loading countries :(</Text>
+                <Text style={styles.errorText}>Failed to load countries :(</Text>
               </View>
             ) : (
               <CountriesList data={stateDetails} style={styles.list} />
