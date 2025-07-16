@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { StatesList } from '@/components/StatesList';
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useListData } from '@/hooks/useListData';
 import { State } from '@/types/types';
 
@@ -46,6 +47,13 @@ export default function HomeScreen() {
   const handleInputSubmit = () => {
     hideKeyboard();
   };
+
+  useBackHandler(() => {
+    hideKeyboard();
+    if (selectedState) {
+      setSelectedState(null);
+    }
+  });
 
   if (isLoading) {
     return (

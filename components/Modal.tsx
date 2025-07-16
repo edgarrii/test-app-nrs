@@ -1,8 +1,8 @@
 import { useStateDetails } from '@/hooks/useStateDetails';
 import { State } from '@/types/types';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { CountriesList } from './CountriesList';
 
 interface ModalProps {
@@ -10,22 +10,38 @@ interface ModalProps {
   onClose: () => void;
 }
 
+// There is a bug in reanimated that sometimes brings crash on Android if Animated component has entering animation
+// https://github.com/software-mansion/react-native-reanimated/issues/7493#issuecomment-3056943474
+// There is still no fix from reanimated team, so I made a solution with onLayout and useSharedValue
+
 export const Modal = memo(({ state, onClose }: ModalProps) => {
+  const animation = useSharedValue(0);
+
   const { stateDetails, isLoading, isError } = useStateDetails(state.detail);
 
   const totalPopulation = useMemo(() => stateDetails.reduce((acc, curr) => acc + curr.population, 0), [stateDetails]);
 
+  const onModalClose = useCallback(() => {
+    animation.value = withTiming(0, { duration: 300 }, (finished) => {
+      if (finished) {
+        runOnJS(onClose)();
+      }
+    });
+  }, [animation, onClose]);
+
+  const onLayout = useCallback(() => {
+    animation.value = withTiming(1, { duration: 300 });
+  }, [animation]);
+
+  const animatedStyles = useAnimatedStyle(() => ({ opacity: animation.value }));
+
   return (
-    <View style={styles.wrapper}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <Animated.View entering={FadeIn.duration(400)} exiting={FadeOut.duration(400)} style={styles.bg} />
+    <View style={styles.wrapper} onLayout={onLayout}>
+      <TouchableWithoutFeedback onPress={onModalClose}>
+        <Animated.View style={[styles.bg, animatedStyles]} />
       </TouchableWithoutFeedback>
 
-      <Animated.View
-        entering={FadeInDown.duration(300).delay(100)}
-        exiting={FadeOutDown.duration(200)}
-        style={styles.modal}
-      >
+      <Animated.View style={[styles.modal, animatedStyles]}>
         {isLoading && <ActivityIndicator style={styles.loader} size="large" color="#b89881" />}
         {!isLoading && (
           <View style={styles.content}>
@@ -48,7 +64,7 @@ export const Modal = memo(({ state, onClose }: ModalProps) => {
           </View>
         )}
 
-        <TouchableOpacity activeOpacity={0.5} style={styles.button} onPress={onClose}>
+        <TouchableOpacity activeOpacity={0.5} style={styles.button} onPress={onModalClose}>
           <Text style={styles.buttonText}>Okay</Text>
         </TouchableOpacity>
       </Animated.View>
