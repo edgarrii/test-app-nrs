@@ -19,7 +19,6 @@ export default function HomeScreen() {
 
   const inputRef = useRef<TextInput>(null);
 
-
   const handleSearch = useCallback((text: string) => {
     setSearch(text);
   }, []);
@@ -73,7 +72,13 @@ export default function HomeScreen() {
         ]}
       >
         <KeyboardAvoidingView style={styles.keyboardAvoidingView} keyboardVerticalOffset={12} behavior={'padding'}>
-          <Input style={styles.input} ref={inputRef} onChangeText={handleSearch} onSubmitEditing={handleInputSubmit} />
+          <Input
+            editable={!selectedState}
+            style={styles.input}
+            ref={inputRef}
+            onChangeText={handleSearch}
+            onSubmitEditing={handleInputSubmit}
+          />
           <View style={styles.lists}>
             <StatesList
               style={styles.list}
@@ -118,9 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'red',
   },
-  input: {
-    elevation: 5,
-  },
+  input: { elevation: 5 },
   lists: {
     flex: 1,
     columnGap: 10,
@@ -129,7 +132,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#fff',
   },
-  list: {
-    flex: 1,
-  },
+  list: { flex: 1 },
 });

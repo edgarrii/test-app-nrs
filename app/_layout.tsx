@@ -3,33 +3,21 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-import { sleep } from '@/utils/utils';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
-
-  const onLayoutRootView = useCallback(() => {
-    if (isReady) {
-      SplashScreen.hide();
-    }
-  }, [isReady]);
-
   useEffect(() => {
-    sleep(1000).then(() => {
-      setIsReady(true);
-      NavigationBar.setButtonStyleAsync('light');
-    });
+    NavigationBar.setButtonStyleAsync('light');
+    NavigationBar.setBackgroundColorAsync('#b89881');
   }, []);
 
-  if (!isReady) {
-    return null;
-  }
+  const onLayoutRootView = useCallback(() => {
+    SplashScreen.hide();
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>

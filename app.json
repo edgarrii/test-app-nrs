@@ -9,7 +9,16 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fff",
+          "resizeMode": "contain",
+          "image": "./assets/images/app-icon.png",
+          "imageWidth": 200
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -22,6 +31,9 @@
     },
     "android": {
       "package": "com.test.app.nrs"
+    },
+    "ios": {
+      "bundleIdentifier": "com.test.app.nrs"
     }
   }
 }

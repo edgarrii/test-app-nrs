@@ -1,7 +1,7 @@
 import { useStateDetails } from '@/hooks/useStateDetails';
 import { State } from '@/types/types';
 import React, { memo, useMemo } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated';
 import { CountriesList } from './CountriesList';
 
@@ -16,7 +16,11 @@ export const Modal = memo(({ state, onClose }: ModalProps) => {
   const totalPopulation = useMemo(() => stateDetails.reduce((acc, curr) => acc + curr.population, 0), [stateDetails]);
 
   return (
-    <Animated.View entering={FadeIn.duration(400)} exiting={FadeOut.duration(400)} style={styles.wrapper}>
+    <View style={styles.wrapper}>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <Animated.View entering={FadeIn.duration(400)} exiting={FadeOut.duration(400)} style={styles.bg} />
+      </TouchableWithoutFeedback>
+
       <Animated.View
         entering={FadeInDown.duration(300).delay(100)}
         exiting={FadeOutDown.duration(200)}
@@ -48,7 +52,7 @@ export const Modal = memo(({ state, onClose }: ModalProps) => {
           <Text style={styles.buttonText}>Okay</Text>
         </TouchableOpacity>
       </Animated.View>
-    </Animated.View>
+    </View>
   );
 });
 
@@ -57,9 +61,13 @@ Modal.displayName = 'Modal';
 const styles = StyleSheet.create({
   wrapper: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    zIndex: 5,
   },
   modal: {
     width: '80%',
@@ -67,6 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 20,
     padding: 16,
+    zIndex: 10,
   },
   loader: {
     flex: 1,

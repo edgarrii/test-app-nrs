@@ -17,7 +17,6 @@ export const CountriesList = memo(({ data, style }: CountriesListProps) => {
   return (
     <FlatList
       scrollEnabled
-      keyboardShouldPersistTaps="handled"
       style={[styles.wrapper, style]}
       showsVerticalScrollIndicator={true}
       scrollEventThrottle={16}
