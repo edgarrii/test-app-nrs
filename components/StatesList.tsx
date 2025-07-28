@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   wrapper: {},
   contentContainerStyle: {
     paddingVertical: 20,
-    paddingHorizontal: 8,
-    rowGap: 20,
+    paddingHorizontal: 2,
+    rowGap: 12,
   },
 });

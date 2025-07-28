@@ -61,13 +61,13 @@ const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 16,
     backgroundColor: '#ffbd76',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     elevation: 5,
   },
   text: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
   },
   highlighted: {

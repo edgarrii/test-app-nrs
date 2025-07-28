@@ -36,5 +36,6 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     width: '100%',
+    rowGap: 4,
   },
 });

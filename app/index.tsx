@@ -1,9 +1,9 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Input } from '@/components/Input';
-import { Modal } from '@/components/Modal';
+import { StateDetails } from '@/components/StateDetails';
 import { StatesList } from '@/components/StatesList';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useListData } from '@/hooks/useListData';
@@ -14,9 +14,10 @@ export default function HomeScreen() {
 
   const [search, setSearch] = useState('');
   const [highlightedStates, setHighlightedStates] = useState<string[]>([]);
-  const [selectedState, setSelectedState] = useState<State | null>(null);
 
   const { originalData, modifiedData, isLoading, isError } = useListData(search, highlightedStates);
+
+  const [selectedState, setSelectedState] = useState<State | null>(null);
 
   const inputRef = useRef<TextInput>(null);
 
@@ -26,9 +27,8 @@ export default function HomeScreen() {
 
   const handleItemPress = useCallback(
     (state: State) => {
-      if (!selectedState) {
+      if (selectedState?.state !== state.state) {
         setSelectedState(state);
-        hideKeyboard();
       }
     },
     [selectedState],
@@ -50,10 +50,13 @@ export default function HomeScreen() {
 
   useBackHandler(() => {
     hideKeyboard();
-    if (selectedState) {
-      setSelectedState(null);
-    }
   });
+
+  useEffect(() => {
+    if (!isLoading && originalData.length > 0) {
+      setSelectedState(originalData[0]);
+    }
+  }, [isLoading]);
 
   if (isLoading) {
     return (
@@ -63,7 +66,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (isError) {
+  if (isError || (!isLoading && !isError && originalData.length === 0)) {
     return (
       <View style={[styles.wrapper, styles.centerContent]}>
         <Text style={styles.errorText}>Sorry, something went wrong :(</Text>
@@ -80,31 +83,24 @@ export default function HomeScreen() {
         ]}
       >
         <KeyboardAvoidingView style={styles.keyboardAvoidingView} keyboardVerticalOffset={12} behavior={'padding'}>
-          <Input
-            editable={!selectedState}
-            style={styles.input}
-            ref={inputRef}
-            onChangeText={handleSearch}
-            onSubmitEditing={handleInputSubmit}
-          />
+          <Input style={styles.input} ref={inputRef} onChangeText={handleSearch} onSubmitEditing={handleInputSubmit} />
           <View style={styles.lists}>
             <StatesList
-              style={styles.list}
+              style={styles.content}
               data={originalData}
               onItemSinglePress={handleItemPress}
               onItemDoublePress={handleItemDoublePress}
             />
             <StatesList
-              style={styles.list}
+              style={styles.content}
               data={modifiedData}
               onItemSinglePress={handleItemPress}
               onItemDoublePress={handleItemDoublePress}
             />
+            {selectedState && <StateDetails style={styles.content} state={selectedState} />}
           </View>
         </KeyboardAvoidingView>
       </View>
-
-      {selectedState && <Modal state={selectedState} onClose={() => setSelectedState(null)} />}
     </View>
   );
 }
@@ -134,11 +130,11 @@ const styles = StyleSheet.create({
   input: { elevation: 5 },
   lists: {
     flex: 1,
-    columnGap: 10,
+    columnGap: 6,
     borderRadius: 16,
     paddingHorizontal: 10,
     flexDirection: 'row',
     backgroundColor: '#fff',
   },
-  list: { flex: 1 },
+  content: { flex: 1 },
 });
